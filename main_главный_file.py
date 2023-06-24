@@ -10,7 +10,7 @@ import codecs
 import tensorflow as tf
 import numpy as np
 
-#############     Тут код для скачивания и конертирования видео и в текст переводить
+#############     Тут код для скачивания и конертирования видео, а также расшифровки в текст
 from pytube import YouTube
 from moviepy.editor import *
 import speech_recognition as sr
@@ -37,11 +37,11 @@ with sr.AudioFile(file_path) as source:
     audio_text = r.record(source)
 
 text = r.recognize_google(audio_text, language="ru-RU")
-'''print(text)'''
+'''print(text)'''     # Получившийся текст
 #############
 
-MAX_SUBSEQUENCE_LEN = 500
-model_file = r'Model_ru_punctuator_h256_lr0.02.pcl'
+MAX_SUBSEQUENCE_LEN = 50000
+model_file = r'Model_ru_punctuator_h256_lr0.02.pcl'   # Модель
 
 def to_array(arr, dtype=np.int32):
     
@@ -130,7 +130,7 @@ if __name__ == "__main__":
     input_text = text        
 
     if len(input_text) == 0:
-        sys.exit("nonono")
+        sys.exit("No")
 
     text = [w for w in input_text.split() if w not in punctuation_vocabulary and w not in data.PUNCTUATION_MAPPING and not w.startswith(data.PAUSE_PREFIX)] + [data.END]
     pauses = [float(s.replace(data.PAUSE_PREFIX,"").replace(">","")) for s in input_text.split() if s.startswith(data.PAUSE_PREFIX)]
@@ -141,15 +141,15 @@ if __name__ == "__main__":
     sentences = punkt_tokenizer.tokenize(text_with_punct)
     sentences = [sent.capitalize() for sent in sentences]
     uppercase_text = ' '.join(sentences)
-    #print(uppercase_text)
+    #print(uppercase_text)                 # uppercase_text - Конечный текст со всеми заглавными буквами и знаками препинания
 
 
 ###########################################################################################################################################
 
 
-
-import yake
-
+'''
+import yake                                #Это инструмент для поиска ключевых слов на yake (хороший инструмент, но не пригодится)
+                                           #Он отлично подходит для различных видео(не лекция)
 ###
 words = uppercase_text.split()
 num_words = len(words)
@@ -173,10 +173,10 @@ my_dict = {}
 
 #text = text.lower()
 
-text_words = uppercase_text.split()
+text_words = uppercase_text.split()'''
 
-punctuations = '''!()-[]{};:'"\,<>./?@#$%^&*_~'''
-
+#punctuations = '''!()-[]{};:'"\,<>./?@#$%^&*_~'''                 #Далее идет расставление слов по порядку
+'''
 for i in range(len(text_words)):
     for punctuation in punctuations:
         text_words[i] = text_words[i].replace(punctuation, "")
@@ -202,7 +202,50 @@ print(' ')
 print(' ')
 print("Текст норм -", uppercase_text)
 print('Ключевые слова списком -', A)
+'''
+######################################################################
 
+#  Дальше пойдет обработка текста с использованием API Chat GPT (самое лучшее решение по соотношению скорости и качества)
+
+import openai
+openai.api_key = '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'
+
+messages = [ {"role": "system", "content": "You are a intelligent assistant."} ]
+message = 'Раздели этот текст на абзацы: ' + uppercase_text
+if message:
+	messages.append(
+		{"role": "user", "content": message},
+	)
+	chat = openai.ChatCompletion.create(
+		model="gpt-3.5-turbo", messages=messages
+	)
+
+reply = chat.choices[0].message.content
+answer = reply
+messages.clear()
+#print(f"ChatGPT: {reply}")
+#messages.append({"role": "assistant", "content": reply})
+
+messages = [ {"role": "system", "content": "You are a intelligent assistant."} ]
+message = 'Выдели из этого текста ключевые предложения: ' + uppercase_text
+if message:
+	messages.append(
+		{"role": "user", "content": message},
+	)
+	chat = openai.ChatCompletion.create(
+		model="gpt-3.5-turbo", messages=messages
+	)
+
+reply = chat.choices[0].message.content
+
+messages.clear()
+
+print(f"Заголовок: {yt.title}")
+print(' ')
+print(' ')
+print(' ')
+print(' ')
+print(f"ChatGPT: {reply}")
 
 
 
