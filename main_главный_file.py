@@ -208,7 +208,7 @@ print('Ключевые слова списком -', A)
 #  Дальше пойдет обработка текста с использованием API Chat GPT (самое лучшее решение по соотношению скорости и качества)
 
 import openai
-openai.api_key = 'api(если надо скину в лс, если его сюда выложить заблокируют)'
+openai.api_key = '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'
 
 messages = [ {"role": "system", "content": "You are a intelligent assistant."} ]
 message = 'Раздели этот текст на абзацы: ' + uppercase_text
@@ -227,7 +227,7 @@ messages.clear()
 #messages.append({"role": "assistant", "content": reply})
 
 messages = [ {"role": "system", "content": "You are a intelligent assistant."} ]
-message = 'Выдели из этого текста ключевые предложения: ' + uppercase_text
+message = 'Выдели из этого текста очень много ключевых предложений: ' + uppercase_text
 if message:
 	messages.append(
 		{"role": "user", "content": message},
@@ -247,6 +247,13 @@ print(' ')
 print(' ')
 print(f"ChatGPT: {reply}")
 
+
+parts = answer.split("\n\n")     # Это список со всеми абзацами
+
+all_parts = []
+
+for part in parts:
+    all_parts.append(part)
 
 
 
