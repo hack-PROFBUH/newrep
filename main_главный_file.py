@@ -208,7 +208,7 @@ print('Ключевые слова списком -', A)
 #  Дальше пойдет обработка текста с использованием API Chat GPT (самое лучшее решение по соотношению скорости и качества)
 
 import openai
-openai.api_key = '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'
+openai.api_key = 'api(если надо скину в лс, если его сюда выложить заблокируют)'
 
 messages = [ {"role": "system", "content": "You are a intelligent assistant."} ]
 message = 'Раздели этот текст на абзацы: ' + uppercase_text
