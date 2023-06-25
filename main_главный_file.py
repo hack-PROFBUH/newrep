@@ -16,7 +16,7 @@ from moviepy.editor import *
 import speech_recognition as sr
 
 ###
-link = input("sslka: ")
+link = input("Ссылка: ")
 yt = YouTube(link)
 ys = yt.streams.get_highest_resolution()
 ys.download(filename="my_video.mp4")
@@ -245,13 +245,26 @@ if message:
 	)
 
 reply = chat.choices[0].message.content
-
 messages.clear()
 
-print(f"Заголовок: {yt.title}")
+messages = [ {"role": "system", "content": "You are a intelligent assistant."} ]
+message = 'Напиши краткое содержание этого текста на 2 предложения' + answer                  #Эту цифру можно заменять
+if message:
+	messages.append(
+		{"role": "user", "content": message},
+	)
+	chat = openai.ChatCompletion.create(
+		model="gpt-3.5-turbo", messages=messages
+	)
+reply = chat.choices[0].message.content
+messages.clear()
+kratkoe_soderzhanie = reply
+
+print(f"Название видео: {yt.title}")
 print(' ')
+print('Ссылка -', link)
 print(' ')
-print(' ')
+print('Краткое содержание -', kratkoe_soderzhanie)
 print(' ')
 print(f"ChatGPT: {reply}")
 
