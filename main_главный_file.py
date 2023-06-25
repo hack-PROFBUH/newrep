@@ -235,7 +235,7 @@ messages.clear()
 #messages.append({"role": "assistant", "content": reply})
 
 messages = [ {"role": "system", "content": "You are a intelligent assistant."} ]
-message = 'Выдели из этого текста очень много ключевых предложений: ' + uppercase_text
+message = 'Выдели из этого текста несколько смысловых абзацев, выводи название абзаца и затем ключевые предложения из него, всего 25 ключевых предложений: ' + uppercase_text
 if message:
 	messages.append(
 		{"role": "user", "content": message},
@@ -244,8 +244,10 @@ if message:
 		model="gpt-3.5-turbo", messages=messages
 	)
 
+
 reply = chat.choices[0].message.content
-messages.clear()
+ast = reply
+#print(f"ChatGPT: {reply}")
 
 messages = [ {"role": "system", "content": "You are a intelligent assistant."} ]
 message = 'Напиши краткое содержание этого текста на 2 предложения' + answer                  #Эту цифру можно заменять
@@ -266,17 +268,44 @@ print('Ссылка -', link)
 print(' ')
 print('Краткое содержание -', kratkoe_soderzhanie)
 print(' ')
-print(f"ChatGPT: {reply}")
+print(ast)
 
-
+##################
 parts = answer.split("\n\n")     # Это список со всеми абзацами
-
 all_parts = []
-
 for part in parts:
     all_parts.append(part)
 
+######################      Далее таймкоды, проверяется похож ли текст на нужную фраху и выводится время началы этой фразы
 
+import speech_recognition as sr
+import difflib
+similarity_threshold = 0.5
+
+uppercase_text = text
+
+for i in range(0, len(ast)):
+    phrase = i
+
+    if phrase in text:
+        raw_audio_data = audio.get_raw_data()
+        frame_rate = audio.sample_rate
+        frame_size = audio.sample_width
+
+        start_index = text.find(phrase)
+        start_time = start_index * frame_size * 1000 / (frame_rate * frame_size)
+        print(start_time)
+    else:
+        words = text.split()
+        frame_rate = audio.sample_rate # определяем frame_rate здесь
+        frame_size = audio.sample_width
+        for word in words:
+            similarity = difflib.SequenceMatcher(None, word, phrase).ratio()
+            if similarity >= similarity_threshold:
+                print(f"Слово {word} похоже на фразу {phrase}.")
+                start_index = text.find(word)
+                start_time = start_index * frame_size * 1000 / (frame_rate * frame_size)
+                print(start_time)
 
 
 
